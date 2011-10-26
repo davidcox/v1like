@@ -464,13 +464,8 @@ def v1like_extract(config_fname,
         "shape": sp.array(fvector.shape, dtype='float32').reshape(1,-1)
         }
 
-<<<<<<< HEAD
-    #sha1_gt = hashlib.sha1(cPickle.dumps(out_dict, 2)).hexdigest()
-    #out_dict['sha1'] = sha1_gt
-=======
     data_sha1_gt = hashlib.sha1(cPickle.dumps(out_dict['data'], 2)).hexdigest()
     out_dict['data_sha1'] = data_sha1_gt
->>>>>>> 6236e0dfb17a9fc594de45ab4ea4268e4f89bf3d
 
     ok = False
     for i in xrange(WRITE_RETRY):
@@ -483,13 +478,8 @@ def v1like_extract(config_fname,
                    )
         try:
             in_dict = io.loadmat(output_fname)
-<<<<<<< HEAD
-            if ((in_dict['data'] == out_dict['data'])).all() and \
-               ((in_dict['shape'] == out_dict['shape'])).all():
-=======
             data_sha1_gv = hashlib.sha1(cPickle.dumps(in_dict['data'], 2)).hexdigest()
             if data_sha1_gv == data_sha1_gt:
->>>>>>> 6236e0dfb17a9fc594de45ab4ea4268e4f89bf3d
                 ok = True
                 break
             #del in_dict['sha1']
