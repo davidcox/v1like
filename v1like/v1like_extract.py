@@ -415,10 +415,10 @@ def v1like_fromfilename(config_fname,
 
     try:
         fvector = v1like_fromarray(imgarr, rep, featsel)
-    except MinMaxError, err:
+    except MinMaxError as err:
         raise MinMaxError("with %s" % input_fname)
-    except AssertionError, err:
-        raise err, "with %s" % input_fname
+    # except AssertionError as err:
+    #     raise AssertionError(err.message + "with %s" % input_fname)
 
     if verbose: print '*'*80
 
