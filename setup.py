@@ -38,6 +38,8 @@ setup(
     name='v1like',
 
     version='dev',
+    
+    scripts=['v1like/v1like_extract.py'],
 
     include_package_data=True,
 

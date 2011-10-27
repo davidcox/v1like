@@ -15,7 +15,6 @@ import cPickle
 from npclockit import clockit_onprofile
 
 from v1like_funcs import get_image, get_image2, conv
-from v1like_funcs import v1like_norm, v1like_filter, v1like_pool
 from v1like_funcs import rephists
 from v1like_math import gabor2d
 
@@ -40,7 +39,8 @@ class MinMaxError(Exception): pass
 
 # ------------------------------------------------------------------------------
 @clockit_onprofile(verbose)
-def v1like_fromarray(arr, params, featsel, ravel_it=True, use_fft_cache=False):
+def v1like_fromarray(arr, params, featsel, 
+                     ravel_it=True, use_fft_cache=False, use_pt3=False):
     """ Applies a simple V1-like model and generates a feature vector from
     its outputs.
 
@@ -56,6 +56,15 @@ def v1like_fromarray(arr, params, featsel, ravel_it=True, use_fft_cache=False):
       fvector -- corresponding feature vector
 
     """
+
+    if use_pt3:
+        from v1like_funcs import v1like_norm_pt as v1like_norm
+        from v1like_funcs import v1like_pool_pt as v1like_pool
+        from v1like_funcs import v1like_filter_pt as v1like_filter
+    else:
+        from v1like_funcs import v1like_norm2_fft as v1like_norm
+        from v1like_funcs import v1like_pool_fft as v1like_pool
+        from v1like_funcs import v1like_filter_fft as v1like_filter
 
     if 'conv_mode' not in params:
         params['conv_mode'] = 'same'
@@ -354,7 +363,7 @@ def get_gabor_filters(params):
 # -------------------------------------------------------------------------
 def v1like_fromfilename(config_fname,
                         input_fname,
-                        ):
+                        use_pt3=False):
 
     """ TODO """
 
@@ -414,7 +423,7 @@ def v1like_fromfilename(config_fname,
                             resize_method=resize_method)
 
     try:
-        fvector = v1like_fromarray(imgarr, rep, featsel)
+        fvector = v1like_fromarray(imgarr, rep, featsel, use_pt3=use_pt3)
     except MinMaxError as err:
         raise MinMaxError("with %s" % input_fname)
     # except AssertionError as err:
@@ -429,8 +438,8 @@ def v1like_fromfilename(config_fname,
 def v1like_extract(config_fname,
                    input_fname,
                    output_fname,
-                   overwrite = DEFAULT_OVERWRITE,
-                   ):
+                   overwrite=DEFAULT_OVERWRITE,
+                   use_pt3=False):
 
     """ Extract v1-like features from an image """
 
@@ -453,7 +462,7 @@ def v1like_extract(config_fname,
         warnings.warn("not allowed to overwrite %s"  % output_fname)
         return
 
-    fvector = v1like_fromfilename(config_fname, input_fname)
+    fvector = v1like_fromfilename(config_fname, input_fname, use_pt3=use_pt3)
 
     if verbose: print "saving data (shape=%s) in %s" % (fvector.shape, output_fname)
 
@@ -522,6 +531,10 @@ def main():
                       action="store_true",
                       help="[default=%default]")
 
+    parser.add_option("--pt3", "-t",
+                      default=False,
+                      action="store_true",
+                      help="[default=%default]")
     opts, args = parser.parse_args()
 
     if len(args) != 3:
@@ -539,7 +552,7 @@ def main():
                        input_fname,
                        output_fname,
                        overwrite = opts.overwrite,
-                       )
+                       use_pt3 = opts.pt3)
 
 
 # --------------------------------
